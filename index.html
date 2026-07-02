@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+======================================================
+Application:  Production Professional Timer
+By Damian Michalowski @Damizon
+License: MIT 2026
+Github: https://github.com/Damizon
+======================================================
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Production Pro Timer</title>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/128/3967/3967518.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/3967/3967518.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ProdTimer">
+	<meta name="mobile-web-app-capable" content="yes">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 10px; overscroll-behavior-y: contain; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; box-sizing: border-box; border-top: 6px solid #0056b3; }
+        h2 { text-align: center; color: #0056b3; margin-top: 0; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .timer-panel { background: #e9ecef; border-radius: 8px; margin: 15px 0; padding: 15px 5px; border: 1px solid #dee2e6; display: flex; justify-content: center; align-items: baseline; }
+        .timer-unit { display: flex; flex-direction: column; align-items: center; width: 80px; }
+        .timer-input { width: 100%; background: transparent; border: none; font-size: 48px; font-weight: bold; font-family: 'Courier New', monospace; color: #222; text-align: center; outline: none; margin: 0; padding: 0; }
+        .timer-input::-webkit-outer-spin-button, .timer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .separator { font-size: 40px; font-weight: bold; color: #666; line-height: 1; margin-top: -10px; }
+        .timer-label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: bold; margin-top: -5px; }
+
+        .input-group { margin-bottom: 12px; }
+        .flex-group { display: flex; gap: 10px; }
+        .flex-group .input-group { flex: 1; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 4px; text-transform: uppercase; }
+        input:not(.timer-input) { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none; }
+        
+        .main-btn { width: 100%; padding: 20px; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; }
+        .start { background: #28a745; }
+        .pause { background: #f39c12; }
+        
+        .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+        .secondary-btn { flex: 1; padding: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .reset-btn { background: #dc3545; color: white; }
+        .save-btn { background: #0056b3; color: white; }
+        
+        .results { background: #eef2f7; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 5px solid #0056b3; }
+        .results h4 { margin: 0 0 10px 0; font-size: 12px; color: #0056b3; text-transform: uppercase; border-bottom: 1px solid #cbd5e0; }
+        .results p { margin: 6px 0; font-size: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dce4ed; padding-bottom: 4px; }
+        .results .highlight { color: #0056b3; font-weight: bold; }
+        .results .real-prod { color: #28a745; font-weight: bold; font-size: 16px; }
+
+        .history { width: 100%; max-width: 450px; margin-top: 20px; }
+        .history h3 { font-size: 13px; color: #666; text-transform: uppercase; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px; }
+        .log-entry { background: white; padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; border-left: 4px solid #28a745; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Production Pro Timer</h2>
+    
+    <div class="input-group">
+        <label>Job Ref:</label>
+        <input type="text" id="orderRef" placeholder="e.g. 004421" onblur="validateFRM()">
+    </div>
+
+    <div class="flex-group">
+        <div class="input-group">
+            <label>Sample Qty:</label>
+            <input type="number" id="testQty" value="1" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Total Order Qty:</label>
+            <input type="number" id="totalQty" value="1" oninput="calculate()">
+        </div>
+    </div>
+
+    <div class="timer-panel">
+        <div class="timer-unit">
+            <input type="number" id="h" class="timer-input" value="00" onchange="manualInput()" onclick="this.select()">
+            <div class="timer-label">HH</div>
+        </div>
+        <div class="separator">:</div>
+        <div class="timer-unit">
+            <input type="number" id="m" class="timer-input" value="00" onchange="manualInput()" onclick="this.select()">
+            <div class="timer-label">MM</div>
+        </div>
+        <div class="separator">:</div>
+        <div class="timer-unit">
+            <input type="number" id="s" class="timer-input" value="00" onchange="manualInput()" onclick="this.select()">
+            <div class="timer-label">SS</div>
+        </div>
+    </div>
+
+    <button id="mainBtn" class="main-btn start" onclick="toggleTimer()">START / PAUSE</button>
+    
+    <div class="btn-row">
+        <button class="secondary-btn reset-btn" onclick="resetAll()">RESET ALL</button>
+        <button class="secondary-btn save-btn" onclick="saveToLog()">SAVE LOG</button>
+    </div>
+
+    <div class="results">
+        <h4>Ideal Performance (Pure Work)</h4>
+        <p>Target MP: <strong id="resMP" class="highlight">0.000</strong></p>
+        <p>Unit Time: <strong id="resUnitClockIdeal" class="highlight">00:00:00</strong></p>
+        <p>Total Est. (Clock): <strong id="estClockIdeal" class="highlight">00:00:00</strong></p>
+        <p>Total Est. (Dec): <strong id="estDec" class="highlight">0.00 h</strong></p>
+        
+        <h4 style="margin-top:15px; color:#28a745;">Real Production (The Curve)</h4>
+        <p>Applied Factor: <strong id="factorApplied" style="color:#28a745;">0%</strong></p>
+        <p>Real MP: <strong id="realMP" class="real-prod">0.000</strong></p>
+        <p>Real Unit Time: <strong id="realUnitClock" class="real-prod">00:00:00</strong></p>
+        <p>Real Total Est: <strong id="realEstClock" class="real-prod">00:00:00</strong></p>
+        <p>Real Est. (Dec): <strong id="realEstDec" class="real-prod">0.00 h</strong></p>
+    </div>
+</div>
+
+<div class="history">
+    <h3>Activity Log (Last 5)</h3>
+    <div id="logContainer"></div>
+</div>
+
+<script>
+    let startTime, elapsedTime = 0, timerInterval;
+    let running = false;
+    let history = JSON.parse(localStorage.getItem('genericProdLog')) || [];
+
+    window.addEventListener('beforeunload', (e) => {
+        if (running || elapsedTime > 0) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    window.onload = () => { updateLogDisplay(); calculate(); };
+
+    function validateFRM() {
+        let el = document.getElementById('orderRef');
+        if (el.value && !el.value.toUpperCase().startsWith('FRM')) el.value = 'FRM' + el.value;
+    }
+
+    function toggleTimer() {
+        if (!running) {
+            startTime = Date.now() - elapsedTime;
+            timerInterval = setInterval(updateDisplay, 100);
+            document.getElementById('mainBtn').className = 'main-btn pause';
+            running = true;
+        } else {
+            clearInterval(timerInterval);
+            document.getElementById('mainBtn').className = 'main-btn start';
+            running = false;
+        }
+    }
+
+    function manualInput() {
+        let h = parseInt(document.getElementById('h').value) || 0;
+        let m = parseInt(document.getElementById('m').value) || 0;
+        let s = parseInt(document.getElementById('s').value) || 0;
+        elapsedTime = (h * 3600 + m * 60 + s) * 1000;
+        if (running) startTime = Date.now() - elapsedTime;
+        refreshInputs();
+        calculate();
+    }
+
+    function resetAll() {
+        if (elapsedTime > 0 && !confirm("Clear all data?")) return;
+        clearInterval(timerInterval);
+        elapsedTime = 0; running = false;
+        document.getElementById('mainBtn').className = 'main-btn start';
+        document.getElementById('orderRef').value = '';
+        refreshInputs();
+        calculate();
+    }
+
+    function updateDisplay() {
+        elapsedTime = Date.now() - startTime;
+        refreshInputs();
+        calculate();
+    }
+
+    function refreshInputs() {
+        let ms = elapsedTime;
+        let hh = Math.floor(ms / 3600000);
+        let mm = Math.floor((ms % 3600000) / 60000);
+        let ss = Math.floor((ms % 60000) / 1000);
+        
+        if (document.activeElement.id !== 'h') document.getElementById('h').value = hh.toString().padStart(2, '0');
+        if (document.activeElement.id !== 'm') document.getElementById('m').value = mm.toString().padStart(2, '0');
+        if (document.activeElement.id !== 's') document.getElementById('s').value = ss.toString().padStart(2, '0');
+    }
+
+    function calculate() {
+    let testQty = parseFloat(document.getElementById('testQty').value) || 1;
+    let totalQty = parseFloat(document.getElementById('totalQty').value) || 0;
+    let seconds = elapsedTime / 1000;
+    
+    if (seconds <= 0) return;
+
+    // 1. Obliczenia IDEALNE
+    let idealMP = (seconds / testQty) / 60;
+    let idealTotalHours = (idealMP * totalQty) / 60;
+    let idealUnitSeconds = seconds / testQty;
+
+    // 2. KRZYWA DAMIZONA - reset fali co 9h zmiany
+    const SHIFT_HOURS = 9;
+    const MAX_FACTOR = 89;
+    let factorPercent = 0;
+
+    if (totalQty > testQty) {
+        // Ratio ogranicza wpływ factor przy bardzo małej różnicy między sample i total
+        let ratio = (totalQty - testQty) / totalQty;
+
+        // Factor nie rośnie od całego zlecenia.
+        // Rośnie tylko wewnątrz aktualnej 9-godzinnej zmiany.
+        let hoursInsideCurrentShift = idealTotalHours % SHIFT_HOURS;
+
+        // Jeśli idealTotalHours wypada dokładnie na końcu zmiany: 9h, 18h, 27h itd.
+        // pokazujemy koniec fali, czyli 89%, a nie reset do 0%.
+        if (hoursInsideCurrentShift === 0 && idealTotalHours > 0) {
+            hoursInsideCurrentShift = SHIFT_HOURS;
+        }
+
+        // Fala factor: 0% na początku zmiany, 89% na końcu 9h zmiany.
+        factorPercent = (hoursInsideCurrentShift / SHIFT_HOURS) * MAX_FACTOR;
+
+        // Uwzględnienie wielkości zlecenia względem próbki.
+        factorPercent *= ratio;
+
+        // Twarde zabezpieczenie: factor nigdy nie przekroczy 89%.
+        factorPercent = Math.min(factorPercent, MAX_FACTOR);
+    } else {
+        factorPercent = 0;
+    }
+
+    let realTotalHours = idealTotalHours * (1 + factorPercent / 100);
+    let realMP = (realTotalHours * 60) / totalQty;
+    let realUnitSeconds = (realTotalHours * 3600) / totalQty;
+
+    // Wyświetlanie IDEAL
+    document.getElementById('resMP').innerText = idealMP.toFixed(3);
+    document.getElementById('resUnitClockIdeal').innerText = formatHms(idealUnitSeconds);
+    document.getElementById('estDec').innerText = idealTotalHours.toFixed(2) + " h";
+    document.getElementById('estClockIdeal').innerText = formatHms(idealTotalHours * 3600);
+
+    // Wyświetlanie REAL
+    document.getElementById('factorApplied').innerText = "+" + factorPercent.toFixed(1) + "%";
+    document.getElementById('realMP').innerText = realMP.toFixed(3);
+    document.getElementById('realUnitClock').innerText = formatHms(realUnitSeconds);
+    document.getElementById('realEstDec').innerText = realTotalHours.toFixed(2) + " h";
+    document.getElementById('realEstClock').innerText = formatHms(realTotalHours * 3600);
+	}
+
+    function formatHms(totalSeconds) {
+        let h = Math.floor(totalSeconds / 3600);
+        let m = Math.floor((totalSeconds % 3600) / 60);
+        let s = Math.round(totalSeconds % 60);
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function saveToLog() {
+        if (elapsedTime === 0) return;
+        const entry = {
+            id: document.getElementById('orderRef').value || "FRM Unknown",
+            time: new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'}),
+            testQty: document.getElementById('testQty').value, // ZAPISUJEMY SAMPLE QTY
+            totalQty: document.getElementById('totalQty').value, // ZAPISUJEMY TOTAL QTY
+            mp: document.getElementById('realMP').innerText,
+            est: document.getElementById('realEstDec').innerText,
+            duration: formatHms(elapsedTime / 1000)
+        };
+        history.unshift(entry);
+        if (history.length > 5) history.pop();
+        localStorage.setItem('genericProdLog', JSON.stringify(history));
+        updateLogDisplay();
+        alert("Log saved.");
+    }
+
+    function updateLogDisplay() {
+        const container = document.getElementById('logContainer');
+        container.innerHTML = '';
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            // WYŚWIETLAMY SAMPLE ORAZ TOTAL W LOGU
+            div.innerHTML = `<div><strong>${item.id}</strong><br>
+                             Measured: ${item.testQty} pcs in ${item.duration}<br>
+                             Total: ${item.totalQty} pcs | Real Est: ${item.est}h</div>
+                             <div style="text-align:right"><span style="color:#28a745; font-weight:bold;">Real MP: ${item.mp}</span><br>
+                             <span style="color:#999; font-size:10px;">${item.time}</span></div>`;
+            container.appendChild(div);
+        });
+    }
+</script>
+<a href="methodology.html" target="_blank" style="display:block; text-align:center; margin-top:10px; font-size:12px; color:#0056b3; text-decoration:none;">View Methodology & Formulas</a>
+<p style="text-align:center; color:#aaa; font-size:12px; margin-top:20px;">Production Pro Timer By Damizon | MIT License 2026</p>
+</body>
+</html>

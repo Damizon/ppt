@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Brief: Adaptive Production Estimator</title>
+    <style>
+        :root {
+            --primary: #004a99;
+            --secondary: #28a745;
+            --accent: #d9534f;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--primary);
+        }
+
+        header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        h1 { margin: 0; color: var(--primary); font-size: 28px; text-transform: uppercase; }
+        .meta { color: #636e72; font-size: 14px; margin-top: 10px; }
+        .meta strong { color: var(--text); }
+
+        h2 {
+            color: var(--primary);
+            font-size: 20px;
+            margin-top: 40px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        h3 { font-size: 16px; color: #0984e3; margin-top: 25px; }
+
+        p { margin-bottom: 15px; text-align: justify; }
+
+        .formula-box {
+            background: #eef2f7;
+            border-left: 5px solid var(--primary);
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .formula { font-size: 22px; font-weight: bold; font-family: "Cambria Math", serif; }
+        .formula-small { margin-top: 15px; font-size: 17px; font-family: "Cambria Math", serif; }
+
+        .chart-box {
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        th { background: #f1f2f6; text-align: left; padding: 12px; border: 1px solid #dfe6e9; }
+        td { padding: 12px; border: 1px solid #dfe6e9; vertical-align: top; }
+
+        .badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        code {
+            background: #eef2f7;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #b2bec3;
+            text-align: center;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Technical Brief: Adaptive Production Estimator</h1>
+        <div class="meta">
+            <strong>Project Lead:</strong> Damian Michalowski @Damizon<br>
+            <strong>Subject:</strong> Wave-Based P-F-D (Personal, Fatigue, Delay) Allowance Modeling<br>
+            <strong>Model Revision:</strong> Shift-reset factor, 9-hour cycle, maximum allowance 89%
+        </div>
+    </header>
+
+    <section>
+        <h2>1. Executive Summary</h2>
+        <p>
+            The <strong>Production Pro Timer</strong> is an adaptive time-study tool designed to bridge the gap between
+            "Ideal Cycle Time" measured from a short sample and "Real-World Output" recorded during production.
+            The revised model uses a <strong>wave-based allowance curve</strong>. The allowance grows during a 9-hour working shift,
+            then resets for the next shift because the operator is assumed to start the next working day rested.
+        </p>
+        <p>
+            This prevents the allowance factor from growing endlessly on multi-day jobs. The factor is capped at
+            <strong>89%</strong> and is calculated only inside the current 9-hour shift window.
+        </p>
+    </section>
+
+    <section>
+        <h2>2. The Core Problem</h2>
+        <p>
+            Standard stopwatch studies often capture "Sprint Speed". This is useful for the ideal unit time, but it does not
+            fully represent the overhead of a real shift: fatigue, material handling, scanning, documentation, breaks,
+            workstation setup, and small interruptions.
+        </p>
+        <ul>
+            <li><strong>Observed Ideal MP:</strong> 0.763 (short 10-unit burst)</li>
+            <li><strong>Observed Real MP:</strong> 1.449 (full 340-unit batch)</li>
+            <li><strong>Recorded Variance:</strong> <span style="color:var(--accent); font-weight:bold;">+89.9%</span></li>
+        </ul>
+        <p>
+            The original single rising curve could exceed realistic values on long jobs. The revised model treats each
+            9-hour shift as a separate fatigue cycle.
+        </p>
+    </section>
+
+    <section class="chart-box">
+        <h3>Figure 1: Wave-Based Overhead Scaling</h3>
+        <svg viewBox="0 0 560 280" style="max-width: 100%; height: auto;" role="img" aria-label="Wave-based allowance curve resetting every 9 hours">
+            <!-- grid -->
+            <line x1="60" y1="40" x2="520" y2="40" stroke="#f1f2f6" stroke-width="1" />
+            <line x1="60" y1="90" x2="520" y2="90" stroke="#f1f2f6" stroke-width="1" />
+            <line x1="60" y1="140" x2="520" y2="140" stroke="#f1f2f6" stroke-width="1" />
+            <line x1="60" y1="190" x2="520" y2="190" stroke="#f1f2f6" stroke-width="1" />
+
+            <!-- axes -->
+            <line x1="60" y1="220" x2="520" y2="220" stroke="#2d3436" stroke-width="2" />
+            <line x1="60" y1="220" x2="60" y2="25" stroke="#2d3436" stroke-width="2" />
+
+            <!-- shift separators -->
+            <line x1="213" y1="30" x2="213" y2="220" stroke="#dfe6e9" stroke-width="2" stroke-dasharray="5 5" />
+            <line x1="366" y1="30" x2="366" y2="220" stroke="#dfe6e9" stroke-width="2" stroke-dasharray="5 5" />
+            <line x1="519" y1="30" x2="519" y2="220" stroke="#dfe6e9" stroke-width="2" stroke-dasharray="5 5" />
+
+            <!-- wave curve: 0-9, 9-18, 18-27 -->
+            <path d="M 60 220 C 95 210, 150 135, 213 40" fill="none" stroke="#004a99" stroke-width="4" stroke-linecap="round" />
+            <path d="M 213 220 C 248 210, 303 135, 366 40" fill="none" stroke="#004a99" stroke-width="4" stroke-linecap="round" />
+            <path d="M 366 220 C 401 210, 456 135, 519 40" fill="none" stroke="#004a99" stroke-width="4" stroke-linecap="round" />
+
+            <!-- reset drops -->
+            <line x1="213" y1="40" x2="213" y2="220" stroke="#d9534f" stroke-width="3" stroke-dasharray="4 4" />
+            <line x1="366" y1="40" x2="366" y2="220" stroke="#d9534f" stroke-width="3" stroke-dasharray="4 4" />
+
+            <!-- markers -->
+            <circle cx="60" cy="220" r="5" fill="#28a745" />
+            <circle cx="213" cy="40" r="6" fill="#d9534f" />
+            <circle cx="366" cy="40" r="6" fill="#d9534f" />
+            <circle cx="519" cy="40" r="6" fill="#d9534f" />
+
+            <!-- labels -->
+            <text x="60" y="238" font-size="11" text-anchor="middle" fill="#636e72">0h</text>
+            <text x="213" y="238" font-size="11" text-anchor="middle" fill="#636e72">9h</text>
+            <text x="366" y="238" font-size="11" text-anchor="middle" fill="#636e72">18h</text>
+            <text x="519" y="238" font-size="11" text-anchor="middle" fill="#636e72">27h</text>
+
+            <text x="47" y="224" font-size="11" text-anchor="end" fill="#636e72">0%</text>
+            <text x="47" y="44" font-size="11" text-anchor="end" fill="#636e72">89%</text>
+
+            <text x="136" y="62" font-size="12" fill="#004a99" font-weight="bold">Shift 1 buildup</text>
+            <text x="286" y="62" font-size="12" fill="#004a99" font-weight="bold">Shift 2 buildup</text>
+            <text x="429" y="62" font-size="12" fill="#004a99" font-weight="bold">Shift 3 buildup</text>
+            <text x="222" y="128" font-size="12" fill="#d9534f" font-weight="bold">Reset</text>
+            <text x="375" y="128" font-size="12" fill="#d9534f" font-weight="bold">Reset</text>
+
+            <text x="290" y="267" font-size="12" text-anchor="middle" fill="#636e72">Ideal workload split into 9-hour shift cycles</text>
+            <text x="18" y="125" font-size="12" text-anchor="middle" transform="rotate(-90 18 125)" fill="#636e72">Allowance factor</text>
+        </svg>
+    </section>
+
+    <section>
+        <h2>3. Mathematical Model</h2>
+        <p>
+            The real estimate is still calculated from ideal time plus allowance. The difference is that the allowance is no longer
+            based on the full job duration. It is based on the current position inside a 9-hour shift cycle.
+        </p>
+        <div class="formula-box">
+            <div class="formula">T<sub>real</sub> = T<sub>ideal</sub> &times; (1 + Allowance / 100)</div>
+            <div class="formula-small">ShiftHours = H<sub>ideal</sub> mod 9</div>
+            <div class="formula-small">Allowance % = (ShiftHours / 9) &times; 89 &times; BatchRatio</div>
+            <div class="formula-small">Allowance % = min(Allowance %, 89)</div>
+        </div>
+        <p>
+            <strong>BatchRatio</strong> is used to reduce the factor when the measured sample is close to the full order quantity.
+            In the application code it is calculated as:
+            <code>(totalQty - testQty) / totalQty</code>.
+        </p>
+        <p>
+            At 9h, 18h, 27h, and every following 9-hour boundary, the model reaches the top of the shift allowance.
+            After the boundary, the next cycle starts from the beginning again.
+        </p>
+    </section>
+
+    <section>
+        <h2>4. Operational Variables Included</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Impact Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Shift Reset</strong></td>
+                    <td>The operator is assumed to recover before the next working day or next production session.</td>
+                    <td>Wave cycle, reset every 9h</td>
+                </tr>
+                <tr>
+                    <td><strong>Fixed P-F-D</strong></td>
+                    <td>Breaks, personal time, and unavoidable delay during the working shift.</td>
+                    <td>Contained inside the 9h cycle</td>
+                </tr>
+                <tr>
+                    <td><strong>Batch Logistics</strong></td>
+                    <td>Material handling, tray inspection, and system logging such as FRM documentation.</td>
+                    <td>Periodic / batch dependent</td>
+                </tr>
+                <tr>
+                    <td><strong>System Latency</strong></td>
+                    <td>Scanning job references, computer login, and status updates.</td>
+                    <td>Repeated during production</td>
+                </tr>
+                <tr>
+                    <td><strong>Physiological</strong></td>
+                    <td>Cumulative fatigue, hydration, posture, and concentration loss during one shift.</td>
+                    <td>Rising inside each shift, reset next cycle</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>5. Validation and Limits</h2>
+        <p>Algorithm reference based on a 340-unit cable assembly job:</p>
+        <table>
+            <tr>
+                <td>Ideal Time (Stopwatch)</td>
+                <td>4.32 Hours</td>
+            </tr>
+            <tr>
+                <td>Observed Real Variance</td>
+                <td><strong>Approximately +89.9%</strong></td>
+            </tr>
+            <tr>
+                <td>Maximum Allowed Factor</td>
+                <td><strong>89%</strong></td>
+            </tr>
+            <tr>
+                <td>Shift Cycle</td>
+                <td><strong>9 hours</strong></td>
+            </tr>
+            <tr>
+                <td>Long Job Behaviour</td>
+                <td>The allowance repeats in waves instead of increasing without limit.</td>
+            </tr>
+        </table>
+        <p>
+            This model is safer for multi-day estimates because it prevents unrealistic values such as several hundred percent
+            allowance on long jobs. It also reflects the practical assumption that fatigue is mostly shift-bound rather than
+            infinitely cumulative.
+        </p>
+    </section>
+
+    <div class="footer">
+        Internal Technical Brief | Elite Electronics Production Standards | &copy; 2026 Damizon
+    </div>
+</div>
+
+</body>
+</html>
