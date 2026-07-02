@@ -1,0 +1,264 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f7f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    overscroll-behavior-y: contain;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+    box-sizing: border-box;
+    border-top: 6px solid #0056b3;
+}
+
+h2 {
+    text-align: center;
+    color: #0056b3;
+    margin-top: 0;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.timer-panel {
+    background: #e9ecef;
+    border-radius: 8px;
+    margin: 15px 0;
+    padding: 15px 5px;
+    border: 1px solid #dee2e6;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+}
+
+.timer-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+}
+
+.timer-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-size: 48px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    color: #222;
+    text-align: center;
+    outline: none;
+    margin: 0;
+    padding: 0;
+}
+
+.timer-input::-webkit-outer-spin-button,
+.timer-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.separator {
+    font-size: 40px;
+    font-weight: bold;
+    color: #666;
+    line-height: 1;
+    margin-top: -10px;
+}
+
+.timer-label {
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-top: -5px;
+}
+
+.input-group {
+    margin-bottom: 12px;
+}
+
+.flex-group {
+    display: flex;
+    gap: 10px;
+}
+
+.flex-group .input-group {
+    flex: 1;
+}
+
+label {
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+input:not(.timer-input) {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+    outline: none;
+}
+
+.main-btn {
+    width: 100%;
+    padding: 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    margin-top: 10px;
+}
+
+.start {
+    background: #28a745;
+}
+
+.pause {
+    background: #f39c12;
+}
+
+.btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.secondary-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.reset-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.save-btn {
+    background: #0056b3;
+    color: white;
+}
+
+.results {
+    background: #eef2f7;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 5px solid #0056b3;
+}
+
+.results h4 {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    color: #0056b3;
+    text-transform: uppercase;
+    border-bottom: 1px solid #cbd5e0;
+}
+
+.results .real-heading {
+    margin-top: 15px;
+    color: #28a745;
+}
+
+.results p {
+    margin: 6px 0;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dce4ed;
+    padding-bottom: 4px;
+}
+
+.results .highlight {
+    color: #0056b3;
+    font-weight: bold;
+}
+
+.results .real-prod,
+.results .factor {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.results .real-prod {
+    font-size: 16px;
+}
+
+.history {
+    width: 100%;
+    max-width: 450px;
+    margin-top: 20px;
+}
+
+.history h3 {
+    font-size: 13px;
+    color: #666;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.log-entry {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    border-left: 4px solid #28a745;
+}
+
+.log-meta {
+    text-align: right;
+}
+
+.log-mp {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.log-time {
+    color: #999;
+    font-size: 10px;
+}
+
+.methodology-link {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.footer {
+    text-align: center;
+    color: #aaa;
+    font-size: 12px;
+    margin-top: 20px;
+}
