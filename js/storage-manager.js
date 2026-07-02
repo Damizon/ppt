@@ -21,6 +21,8 @@
         if (restored) {
             activeStorage = fileStorageApi;
             mode = 'shared';
+        } else if (fileStorageApi.hasRememberedFolder && fileStorageApi.hasRememberedFolder()) {
+            mode = 'remembered';
         }
     }
 
@@ -50,6 +52,7 @@
             mode,
             sharedSupported: Boolean(fileStorageApi && fileStorageApi.isSupported()),
             sharedConnected: mode === 'shared',
+            sharedRemembered: mode === 'remembered',
             requiresConnection: true
         };
     }

@@ -163,9 +163,22 @@
     function renderStorageStatus() {
         const status = storage.getStorageStatus();
 
-        elements.storageStatus.innerText = status.sharedConnected ? 'Shared Data Folder' : 'Folder not connected';
+        elements.storageStatus.innerText = getStorageStatusLabel(status);
+        elements.connectStorageBtn.innerText = status.sharedRemembered ? 'RECONNECT DATA FOLDER' : 'CONNECT DATA FOLDER';
         elements.connectStorageBtn.disabled = !status.sharedSupported;
         elements.disconnectStorageBtn.disabled = !status.sharedConnected;
+    }
+
+    function getStorageStatusLabel(status) {
+        if (status.sharedConnected) {
+            return 'Shared Data Folder';
+        }
+
+        if (status.sharedRemembered) {
+            return 'Data folder remembered';
+        }
+
+        return 'Folder not connected';
     }
 
     async function saveAsNewPreset() {

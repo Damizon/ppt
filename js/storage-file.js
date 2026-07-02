@@ -9,6 +9,7 @@
     const HISTORY_LIMIT = 5;
 
     let directoryHandle = null;
+    let rememberedDirectoryHandle = null;
 
     function isSupported() {
         return Boolean(window.showDirectoryPicker && window.indexedDB);
@@ -19,19 +20,20 @@
             return false;
         }
 
-        directoryHandle = await loadHandle();
+        rememberedDirectoryHandle = await loadHandle();
 
-        if (!directoryHandle) {
+        if (!rememberedDirectoryHandle) {
             return false;
         }
 
-        const hasPermission = await verifyPermission(directoryHandle, false);
+        const hasPermission = await verifyPermission(rememberedDirectoryHandle, false);
 
         if (!hasPermission) {
             directoryHandle = null;
             return false;
         }
 
+        directoryHandle = rememberedDirectoryHandle;
         await ensureFiles(defaultSettings);
         return true;
     }
@@ -41,23 +43,43 @@
             throw new Error('Shared folder storage is not supported by this browser.');
         }
 
-        directoryHandle = await window.showDirectoryPicker({
+        const rememberedHandle = directoryHandle || rememberedDirectoryHandle || await loadHandle();
+
+        if (rememberedHandle) {
+            rememberedDirectoryHandle = rememberedHandle;
+
+            const hasRememberedPermission = await verifyPermission(rememberedHandle, true);
+
+            if (!hasRememberedPermission) {
+                directoryHandle = null;
+                throw new Error('Write permission was not granted for the remembered data folder.');
+            }
+
+            directoryHandle = rememberedHandle;
+            await saveHandle(directoryHandle);
+            await ensureFiles(defaultSettings);
+            return true;
+        }
+
+        const pickedHandle = await window.showDirectoryPicker({
             id: 'production-pro-timer-data',
             mode: 'readwrite'
         });
 
-        if (directoryHandle.name !== 'data' && !confirm('The selected folder is not named "data". Use this folder anyway?')) {
+        if (pickedHandle.name !== 'data' && !confirm('The selected folder is not named "data". Use this folder anyway?')) {
             directoryHandle = null;
             return false;
         }
 
-        const hasPermission = await verifyPermission(directoryHandle, true);
+        const hasPermission = await verifyPermission(pickedHandle, true);
 
         if (!hasPermission) {
             directoryHandle = null;
             throw new Error('Write permission was not granted for the selected folder.');
         }
 
+        directoryHandle = pickedHandle;
+        rememberedDirectoryHandle = pickedHandle;
         await saveHandle(directoryHandle);
         await ensureFiles(defaultSettings);
         return true;
@@ -65,11 +87,16 @@
 
     async function disconnect() {
         directoryHandle = null;
+        rememberedDirectoryHandle = null;
         await deleteHandle();
     }
 
     function isConnected() {
         return Boolean(directoryHandle);
+    }
+
+    function hasRememberedFolder() {
+        return Boolean(rememberedDirectoryHandle);
     }
 
     async function loadHistory() {
@@ -314,6 +341,7 @@
         connect,
         disconnect,
         isConnected,
+        hasRememberedFolder,
         loadHistory,
         loadAllHistory,
         addHistoryEntry,
