@@ -21,6 +21,7 @@ The app is designed to run as static files. You can open `index.html` directly f
 .
 |-- index.html              # Main timer app
 |-- calibration.html        # Calibration and preset management
+|-- logs.html               # Full production log viewer
 |-- methodology.html        # Technical model explanation
 |-- css/
 |   `-- styles.css
@@ -29,6 +30,7 @@ The app is designed to run as static files. You can open `index.html` directly f
     |-- calculator.js       # Production estimate algorithm
     |-- calibration.js      # Calibration page logic
     |-- format.js           # Time formatting helpers
+    |-- logs.js             # Full log viewer
     |-- storage-file.js     # shared data folder persistence
     |-- storage-local.js    # localStorage persistence
     |-- storage-manager.js  # storage mode selection
@@ -105,7 +107,7 @@ data/
 |-- README.md
 |-- calibration-presets.json
 |-- active-calibration.json
-`-- production-log.txt
+`-- production-log.jsonl
 ```
 
 This folder is the shared storage location for production use. Each workstation should click `Connect Data Folder` and select the same `data` folder next to `index.html`.
@@ -114,7 +116,7 @@ Initial shared files:
 
 - `data/calibration-presets.json` - default calibration preset seed.
 - `data/active-calibration.json` - active shared preset pointer.
-- `data/production-log.txt` - append-style production log file.
+- `data/production-log.jsonl` - append-style production log file.
 
 Browser support note: shared folder storage requires File System Access API support, which is available in Chromium-based browsers such as Chrome and Edge. If unsupported or disconnected, the app falls back to local browser storage.
 

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Production Pro Timer Logs</title>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/128/3967/3967518.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/3967/3967518.png">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="card log-page-card">
+    <h2>Production Logs</h2>
+
+    <div class="storage-panel calibration-storage-panel">
+        <span>Storage: <strong id="storageStatus">Local Browser</strong></span>
+        <button id="connectStorageBtn" class="secondary-btn">CONNECT DATA FOLDER</button>
+        <button id="disconnectStorageBtn" class="secondary-btn reset-btn">DISCONNECT</button>
+    </div>
+
+    <div class="results compact-results">
+        <h4>Summary</h4>
+        <p>Total Entries: <strong id="logCount" class="highlight">0</strong></p>
+        <p>Latest Entry: <strong id="latestLogTime" class="highlight">-</strong></p>
+    </div>
+
+    <div class="log-table-wrap">
+        <table class="log-table">
+            <thead>
+                <tr>
+                    <th>Created</th>
+                    <th>Job</th>
+                    <th>Measured</th>
+                    <th>Total</th>
+                    <th>Real MP</th>
+                    <th>Estimate</th>
+                </tr>
+            </thead>
+            <tbody id="allLogRows"></tbody>
+        </table>
+    </div>
+</div>
+
+<a href="index.html" class="methodology-link">Back to Timer</a>
+<a href="calibration.html" class="methodology-link">Calibration</a>
+<p class="footer">Production Pro Timer By Damizon | MIT License 2026</p>
+
+<script src="js/format.js"></script>
+<script src="js/calculator.js"></script>
+<script src="js/storage-local.js"></script>
+<script src="js/storage-file.js"></script>
+<script src="js/storage-manager.js"></script>
+<script src="js/logs.js"></script>
+</body>
+</html>

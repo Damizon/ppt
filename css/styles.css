@@ -308,6 +308,10 @@ select {
     max-width: 560px;
 }
 
+.log-page-card {
+    max-width: 980px;
+}
+
 .calibration-section {
     margin-top: 18px;
 }
@@ -370,4 +374,29 @@ input[type="range"] {
     font-weight: bold;
     text-transform: uppercase;
     margin-bottom: 12px;
+}
+
+.log-table-wrap {
+    margin-top: 15px;
+    overflow-x: auto;
+}
+
+.log-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+}
+
+.log-table th,
+.log-table td {
+    border-bottom: 1px solid #dce4ed;
+    padding: 10px 8px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.log-table th {
+    color: #0056b3;
+    font-size: 11px;
+    text-transform: uppercase;
 }

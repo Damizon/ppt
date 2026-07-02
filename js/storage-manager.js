@@ -57,6 +57,14 @@
         return activeStorage.loadHistory();
     }
 
+    async function loadAllHistory() {
+        if (activeStorage.loadAllHistory) {
+            return activeStorage.loadAllHistory();
+        }
+
+        return activeStorage.loadHistory();
+    }
+
     async function saveHistory(history) {
         if (activeStorage.saveHistory) {
             return activeStorage.saveHistory(history);
@@ -99,6 +107,7 @@
         disconnectSharedFolder,
         getStorageStatus,
         loadHistory,
+        loadAllHistory,
         saveHistory,
         addHistoryEntry,
         loadCalibrationSettings,

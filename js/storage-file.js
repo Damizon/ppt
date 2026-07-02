@@ -5,7 +5,7 @@
     const DATA_FOLDER_HANDLE_KEY = 'data-folder';
     const PRESETS_FILE = 'calibration-presets.json';
     const ACTIVE_FILE = 'active-calibration.json';
-    const LOG_FILE = 'production-log.txt';
+    const LOG_FILE = 'production-log.jsonl';
     const HISTORY_LIMIT = 5;
 
     let directoryHandle = null;
@@ -73,6 +73,11 @@
     }
 
     async function loadHistory() {
+        const entries = await loadAllHistory();
+        return entries.slice(-HISTORY_LIMIT).reverse();
+    }
+
+    async function loadAllHistory() {
         if (!directoryHandle) {
             return [];
         }
@@ -85,7 +90,7 @@
             .map(parseLogLine)
             .filter(Boolean);
 
-        return entries.slice(-HISTORY_LIMIT).reverse();
+        return entries;
     }
 
     async function addHistoryEntry(entry) {
@@ -310,6 +315,7 @@
         disconnect,
         isConnected,
         loadHistory,
+        loadAllHistory,
         addHistoryEntry,
         loadCalibrationSettings,
         saveCalibrationSettings,

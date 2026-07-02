@@ -10,6 +10,10 @@
         return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     }
 
+    function loadAllHistory() {
+        return loadHistory();
+    }
+
     function saveHistory(history) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
     }
@@ -129,6 +133,7 @@
 
     const api = {
         loadHistory,
+        loadAllHistory,
         saveHistory,
         addHistoryEntry,
         loadCalibrationSettings,
