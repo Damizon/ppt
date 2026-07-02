@@ -5,7 +5,7 @@
     const DATA_FOLDER_HANDLE_KEY = 'data-folder';
     const PRESETS_FILE = 'calibration-presets.json';
     const ACTIVE_FILE = 'active-calibration.json';
-    const LOG_FILE = 'logs.jsonl';
+    const LOG_FILE = 'production-log.txt';
     const HISTORY_LIMIT = 5;
 
     let directoryHandle = null;

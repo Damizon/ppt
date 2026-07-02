@@ -105,7 +105,7 @@ data/
 |-- README.md
 |-- calibration-presets.json
 |-- active-calibration.json
-`-- logs.jsonl
+`-- production-log.txt
 ```
 
 This folder is the shared storage location for production use. Each workstation should click `Connect Data Folder` and select the same `data` folder next to `index.html`.
@@ -114,7 +114,7 @@ Initial shared files:
 
 - `data/calibration-presets.json` - default calibration preset seed.
 - `data/active-calibration.json` - active shared preset pointer.
-- `data/logs.jsonl` - append-style production log file.
+- `data/production-log.txt` - append-style production log file.
 
 Browser support note: shared folder storage requires File System Access API support, which is available in Chromium-based browsers such as Chrome and Edge. If unsupported or disconnected, the app falls back to local browser storage.
 

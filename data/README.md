@@ -8,6 +8,6 @@ Expected files:
 
 - `calibration-presets.json` - shared calibration presets.
 - `active-calibration.json` - the preset selected for production use.
-- `logs.jsonl` - production log entries, one JSON object per line.
+- `production-log.txt` - production log entries, one JSON object per line.
 
 Do not rename this folder unless every workstation is updated to use the new location.
