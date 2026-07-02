@@ -7,6 +7,7 @@
     const elements = {};
     let timer;
     let calibrationSettings;
+    let activeCalibrationPreset;
 
     window.addEventListener('DOMContentLoaded', init);
 
@@ -30,8 +31,10 @@
             onChange: handleTimerChange
         });
 
-        calibrationSettings = storage.loadCalibrationSettings(calculator.DEFAULT_SETTINGS);
+        activeCalibrationPreset = storage.loadActiveCalibrationPreset(calculator.DEFAULT_SETTINGS);
+        calibrationSettings = activeCalibrationPreset.settings;
         bindEvents();
+        renderActiveCalibration();
         updateLogDisplay(storage.loadHistory());
         calculate();
     }
@@ -56,6 +59,7 @@
         elements.realUnitClock = document.getElementById('realUnitClock');
         elements.realEstClock = document.getElementById('realEstClock');
         elements.realEstDec = document.getElementById('realEstDec');
+        elements.activeCalibration = document.getElementById('activeCalibration');
     }
 
     function bindEvents() {
@@ -143,6 +147,14 @@
         elements.realUnitClock.innerText = format.formatHms(result.real.unitSeconds);
         elements.realEstDec.innerText = result.real.totalHours.toFixed(2) + ' h';
         elements.realEstClock.innerText = format.formatHms(result.real.totalHours * 3600);
+    }
+
+    function renderActiveCalibration() {
+        if (!elements.activeCalibration) {
+            return;
+        }
+
+        elements.activeCalibration.innerText = activeCalibrationPreset.name;
     }
 
     function saveToLog() {

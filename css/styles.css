@@ -104,7 +104,8 @@ label {
     text-transform: uppercase;
 }
 
-input:not(.timer-input) {
+input:not(.timer-input),
+select {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;
@@ -112,6 +113,7 @@ input:not(.timer-input) {
     box-sizing: border-box;
     font-size: 16px;
     outline: none;
+    background: white;
 }
 
 .main-btn {
@@ -148,6 +150,11 @@ input:not(.timer-input) {
     cursor: pointer;
     font-weight: bold;
     font-size: 14px;
+}
+
+.secondary-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 
 .reset-btn {
@@ -274,6 +281,14 @@ input:not(.timer-input) {
 
 .calibration-section {
     margin-top: 18px;
+}
+
+.preset-section {
+    margin-top: 0;
+}
+
+.preset-actions {
+    margin-top: 8px;
 }
 
 .calibration-section h3 {

@@ -3,13 +3,20 @@
     const storage = window.ProdTimerStorage;
 
     const elements = {};
+    let presets = [];
+    let selectedPresetId;
+    let activePresetId;
 
     window.addEventListener('DOMContentLoaded', init);
 
     function init() {
         cacheElements();
+        presets = storage.loadCalibrationPresets(calculator.DEFAULT_SETTINGS);
+        activePresetId = storage.loadActiveCalibrationPreset(calculator.DEFAULT_SETTINGS).id;
+        selectedPresetId = activePresetId;
         bindEvents();
-        setSettings(storage.loadCalibrationSettings(calculator.DEFAULT_SETTINGS));
+        renderPresetOptions();
+        loadPreset(selectedPresetId);
         updateKnownJob();
         updatePreview();
     }
@@ -37,9 +44,15 @@
             'previewReal',
             'previewFactor',
             'previewError',
+            'presetSelect',
+            'presetName',
+            'activePresetName',
+            'loadPresetBtn',
+            'saveAsPresetBtn',
+            'updatePresetBtn',
+            'deletePresetBtn',
             'loadDefaultsBtn',
-            'autoFitBtn',
-            'saveCalibrationBtn'
+            'autoFitBtn'
         ].forEach((id) => {
             elements[id] = document.getElementById(id);
         });
@@ -58,17 +71,128 @@
             input.addEventListener('input', updateKnownJob);
         });
 
+        elements.presetSelect.addEventListener('change', () => {
+            selectedPresetId = elements.presetSelect.value;
+            loadPreset(selectedPresetId);
+        });
+
+        elements.loadPresetBtn.addEventListener('click', () => {
+            loadPreset(elements.presetSelect.value);
+            setActivePreset(elements.presetSelect.value);
+        });
+
+        elements.saveAsPresetBtn.addEventListener('click', saveAsNewPreset);
+        elements.updatePresetBtn.addEventListener('click', updateSelectedPreset);
+        elements.deletePresetBtn.addEventListener('click', deleteSelectedPreset);
+
         elements.loadDefaultsBtn.addEventListener('click', () => {
             setSettings(calculator.DEFAULT_SETTINGS);
+            elements.presetName.value = 'Default';
             updatePreview();
         });
 
         elements.autoFitBtn.addEventListener('click', autoFitBaseAllowance);
+    }
 
-        elements.saveCalibrationBtn.addEventListener('click', () => {
-            storage.saveCalibrationSettings(readSettings());
-            alert('Calibration saved.');
+    function renderPresetOptions() {
+        elements.presetSelect.innerHTML = '';
+
+        presets.forEach((preset) => {
+            const option = document.createElement('option');
+            option.value = preset.id;
+            option.innerText = preset.name;
+            elements.presetSelect.appendChild(option);
         });
+
+        elements.presetSelect.value = selectedPresetId;
+        renderPresetActions();
+    }
+
+    function renderPresetActions() {
+        const selectedPreset = findPreset(selectedPresetId);
+        const isDefault = selectedPresetId === storage.DEFAULT_PRESET_ID;
+        const activePreset = findPreset(activePresetId);
+
+        elements.presetName.value = selectedPreset ? selectedPreset.name : '';
+        elements.activePresetName.innerText = activePreset ? activePreset.name : 'Default';
+        elements.updatePresetBtn.disabled = isDefault;
+        elements.deletePresetBtn.disabled = isDefault;
+    }
+
+    function loadPreset(id) {
+        const preset = findPreset(id) || presets[0];
+
+        selectedPresetId = preset.id;
+        elements.presetSelect.value = selectedPresetId;
+        setSettings(preset.settings);
+        renderPresetActions();
+        updatePreview();
+    }
+
+    function saveAsNewPreset() {
+        const preset = storage.createCalibrationPreset(readPresetName(), readSettings());
+
+        presets.push(preset);
+        selectedPresetId = preset.id;
+        savePresetList();
+        setActivePreset(preset.id);
+        renderPresetOptions();
+        alert('Calibration preset saved.');
+    }
+
+    function updateSelectedPreset() {
+        if (selectedPresetId === storage.DEFAULT_PRESET_ID) {
+            return;
+        }
+
+        const preset = findPreset(selectedPresetId);
+
+        if (!preset) {
+            return;
+        }
+
+        preset.name = readPresetName();
+        preset.settings = readSettings();
+        preset.updatedAt = new Date().toISOString();
+        savePresetList();
+        setActivePreset(preset.id);
+        renderPresetOptions();
+        alert('Calibration preset updated.');
+    }
+
+    function deleteSelectedPreset() {
+        if (selectedPresetId === storage.DEFAULT_PRESET_ID) {
+            return;
+        }
+
+        const preset = findPreset(selectedPresetId);
+
+        if (!preset || !confirm('Delete calibration preset "' + preset.name + '"?')) {
+            return;
+        }
+
+        presets = presets.filter((item) => item.id !== selectedPresetId);
+
+        if (activePresetId === selectedPresetId) {
+            setActivePreset(storage.DEFAULT_PRESET_ID);
+        }
+
+        selectedPresetId = activePresetId;
+        savePresetList();
+        renderPresetOptions();
+        loadPreset(selectedPresetId);
+    }
+
+    function setActivePreset(id) {
+        activePresetId = id;
+        storage.saveActiveCalibrationPresetId(id);
+
+        const activePreset = findPreset(activePresetId);
+        if (activePreset) {
+            storage.saveCalibrationSettings(activePreset.settings);
+        }
+
+        renderPresetActions();
     }
 
     function updateKnownJob() {
@@ -170,6 +294,19 @@
 
     function readKnownActualHours() {
         return Number.parseFloat(elements.knownActual.value) || 0;
+    }
+
+    function readPresetName() {
+        const name = elements.presetName.value.trim();
+        return name || 'New Calibration';
+    }
+
+    function findPreset(id) {
+        return presets.find((preset) => preset.id === id);
+    }
+
+    function savePresetList() {
+        storage.saveCalibrationPresets(presets);
     }
 
     function formatSignedPercent(value) {
